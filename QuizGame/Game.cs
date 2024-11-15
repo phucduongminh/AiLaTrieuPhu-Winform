@@ -28,6 +28,8 @@ namespace QuizGame
         public Game()
         {
             InitializeComponent();
+            this.Size = new Size(1630, 900);
+            this.Text = "Ai La Trieu Phu";
         }
 
         public void UpdateLabelText()
@@ -105,6 +107,12 @@ namespace QuizGame
 
         public void WrongAnswer()
         {
+            // Stop timer and ensure progress bar resets
+            timer1.Stop();
+            counters.Time = 0;
+            progressBar1.Value = 0;
+
+            // Display prize won message
             if (counters.QuestionCount < 3)
             {
                 MessageBox.Show("Prize Won\n0 TL", "Incorrect Answer", MessageBoxButtons.OK);
@@ -117,11 +125,17 @@ namespace QuizGame
             {
                 MessageBox.Show("Prize Won\n10000 TL", "Incorrect Answer", MessageBoxButtons.OK);
             }
-            counters.Time = 0;
-            progressBar1.Value = 0;
-            Form1 form = new Form1();
-            form.ShowDialog();
-            Close();
+
+            // Open new form asynchronously and close current form
+            Task.Run(() =>
+            {
+                Invoke((Action)(() =>
+                {
+                    Form1 form = new Form1();
+                    form.ShowDialog();
+                    Close();
+                }));
+            });
         }
 
         private void Game_Load(object sender, EventArgs e)
@@ -134,6 +148,7 @@ namespace QuizGame
             progressBar1.Minimum = 0;
             progressBar1.Maximum = 40;
             timer1.Start();
+            this.Text = "Ai La Trieu Phu";
         }
 
         private void btnExit_Click(object sender, EventArgs e)
@@ -240,32 +255,31 @@ namespace QuizGame
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            timer1.Interval = 1000;
+            timer1.Interval = 1000; // Set interval explicitly
             counters.Time++;
             progressBar1.Value++;
-            if (counters.Time == counters.MaxTime && counters.PrizeCounter != -1)
+
+            // Handle time up condition
+            if (counters.Time >= counters.MaxTime)
             {
-                sound.TimeUp();
-                Thread.Sleep(2000);
-                sound.TimeUp();
                 timer1.Stop();
                 progressBar1.Value = 0;
-                MessageBox.Show($"Prize Won\n{counters.Labels[counters.PrizeCounter].Text}", "Time's Up");
-                Form1 form = new Form1();
-                form.ShowDialog();
-                Close();
-            }
-            else if (counters.Time == counters.MaxTime && counters.PrizeCounter == -1)
-            {
-                sound.TimeUp();
-                Thread.Sleep(2000);
-                sound.TimeUp();
-                timer1.Stop();
-                progressBar1.Value = 0;
-                MessageBox.Show($"Prize Won\n{0}", "Time's Up");
-                Form1 form = new Form1();
-                form.ShowDialog();
-                Close();
+
+                string prizeMessage = counters.PrizeCounter != -1
+                    ? $"Prize Won\n{counters.Labels[counters.PrizeCounter].Text}"
+                    : $"Prize Won\n0";
+
+                MessageBox.Show(prizeMessage, "Time's Up");
+
+                Task.Run(() =>
+                {
+                    Invoke((Action)(() =>
+                    {
+                        Form1 form = new Form1();
+                        form.ShowDialog();
+                        Close();
+                    }));
+                });
             }
         }
 
@@ -291,5 +305,19 @@ namespace QuizGame
 
         }
 
+        private void lblC_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblPrize10_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void progressBar1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
