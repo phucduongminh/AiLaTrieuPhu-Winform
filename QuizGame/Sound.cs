@@ -1,6 +1,6 @@
-﻿using NAudio.Wave;
-using System;
+﻿using System;
 using System.IO;
+using NAudio.Wave;
 
 namespace QuizGame
 {
@@ -9,38 +9,47 @@ namespace QuizGame
         private IWavePlayer waveOut;
         private AudioFileReader audioFileReader;
 
-        public string FilePath { get; set; }  // Property to store the resolved file path
+        // Full paths for sound files
+        private readonly string introSoundPath = @".\Sounds\intro.wav";
+        private readonly string correctSoundPath = @".\Sounds\correct.wav";
+        private readonly string wrongSoundPath = @".\Sounds\wrong.wav";
+        private readonly string timeUpSoundPath = @".\Sounds\timesup.wav";
 
-        private void PlaySound(string fileName)
+        // Method to play sound using a full file path
+        private void PlaySound(string filePath)
         {
-            // Resolve the full path of the audio file
-            FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-
-            if (File.Exists(FilePath))
+            try
             {
-                // Stop and dispose of the previous playback instance
-                waveOut?.Stop();
-                waveOut?.Dispose();
-                audioFileReader?.Dispose();
+                if (File.Exists(filePath))
+                {
+                    // Stop and dispose of any previous playback instances
+                    waveOut?.Stop();
+                    waveOut?.Dispose();
+                    audioFileReader?.Dispose();
 
-                // Create new playback instances
-                waveOut = new WaveOutEvent();
-                audioFileReader = new AudioFileReader(FilePath);
+                    // Create new playback instances
+                    waveOut = new WaveOutEvent();
+                    audioFileReader = new AudioFileReader(filePath);
 
-                // Initialize and play the audio file
-                waveOut.Init(audioFileReader);
-                waveOut.Play();
+                    // Initialize and play the audio file
+                    waveOut.Init(audioFileReader);
+                    waveOut.Play();
+                }
+                else
+                {
+                    Console.WriteLine($"Error: Sound file not found at {filePath}");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine($"Error: Sound file '{fileName}' not found at {FilePath}");
+                Console.WriteLine($"An error occurred while trying to play the sound: {ex.Message}");
             }
         }
 
         // Methods to play specific sounds
         public void StartIntro()
         {
-            PlaySound("intro.wav");
+            PlaySound(introSoundPath);
         }
 
         public void StopIntro()
@@ -50,17 +59,17 @@ namespace QuizGame
 
         public void CorrectAnswer()
         {
-            PlaySound("correct.wav");
+            PlaySound(correctSoundPath);
         }
 
         public void WrongAnswer()
         {
-            PlaySound("wrong.wav");
+            PlaySound(wrongSoundPath);
         }
 
         public void TimeUp()
         {
-            PlaySound("timesup.wav");
+            PlaySound(timeUpSoundPath);
         }
     }
 }

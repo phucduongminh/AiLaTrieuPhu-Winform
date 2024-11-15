@@ -34,59 +34,53 @@ namespace QuizGame
 
         public void UpdateLabelText()
         {
-            while (true)
+            List<int> availableQuestions = Enumerable.Range(1, 50).Except(counters.Indices).ToList();
+
+            if (!availableQuestions.Any())
             {
-                counters.QuestionIndex = new Random().Next(1, 50);
-                if ("Easy" == answerManager.ListQuestions()[counters.QuestionIndex].ToString() && counters.QuestionCount < 6)
+                MessageBox.Show("No more questions available.");
+                return;
+            }
+
+            foreach (int questionIndex in availableQuestions)
+            {
+                var questionDifficulty = answerManager.ListQuestions()[questionIndex].ToString();
+
+                if ((questionDifficulty == "Easy" && counters.QuestionCount < 6) ||
+                    (questionDifficulty == "Hard" && counters.QuestionCount >= 6))
                 {
-                    if (!counters.Indices.Contains(counters.QuestionIndex))
+                    counters.QuestionIndex = questionIndex;
+
+                    // Update counters and labels
+                    MessageBox.Show("Congratulations, you answered correctly!\nProceed to the next question.");
+                    counters.Indices.Add(counters.QuestionIndex);
+                    answerManager.UpdateCounters(counters.QuestionIndex);
+                    counters.QuestionCount++;
+
+                    lblQuestion.Text = db.Questions.ListQuestions()[counters.QuestionIndex].ToString();
+                    lblA.Text = db.Answers.ListOptionA()[counters.QuestionIndex].ToString();
+                    lblB.Text = db.Answers.ListOptionB()[counters.QuestionIndex].ToString();
+                    lblC.Text = db.Answers.ListOptionC()[counters.QuestionIndex].ToString();
+                    lblD.Text = db.Answers.ListOptionD()[counters.QuestionIndex].ToString();
+
+                    counters.PrizeCounter++;
+                    counters.Time = 0;
+                    progressBar1.Value = 0;
+
+                    // Adjust timer for harder questions
+                    if (counters.QuestionCount > 5)
                     {
-                        MessageBox.Show("Congratulations, you answered correctly!\nProceed to the next question.");
-                        counters.Indices.Add(counters.QuestionIndex);
-                        answerManager.UpdateCounters(counters.QuestionIndex);
-                        counters.QuestionCount++;
-                        lblQuestion.Text = db.Questions.ListQuestions()[counters.QuestionIndex].ToString();
-                        lblA.Text = db.Answers.ListOptionA()[counters.QuestionIndex].ToString();
-                        lblB.Text = db.Answers.ListOptionB()[counters.QuestionIndex].ToString();
-                        lblC.Text = db.Answers.ListOptionC()[counters.QuestionIndex].ToString();
-                        lblD.Text = db.Answers.ListOptionD()[counters.QuestionIndex].ToString();
-                        counters.PrizeCounter++;
-                        counters.Time = 0;
-                        progressBar1.Value = 0;
-                        break;
+                        counters.MaxTime = 120;
+                        progressBar1.Maximum = 121;
                     }
-                }
-                if ("Hard" == answerManager.ListQuestions()[counters.QuestionIndex].ToString() && counters.QuestionCount > 5)
-                {
-                    counters.MaxTime = 120;
-                    progressBar1.Maximum = 121;
-                    if (!counters.Indices.Contains(counters.QuestionIndex))
-                    {
-                        MessageBox.Show("Congratulations, you answered correctly!\nProceed to the next question.");
-                        counters.Indices.Add(counters.QuestionIndex);
-                        answerManager.UpdateCounters(counters.QuestionIndex);
-                        counters.QuestionCount++;
-                        lblQuestion.Text = db.Questions.ListQuestions()[counters.QuestionIndex].ToString();
-                        lblA.Text = db.Answers.ListOptionA()[counters.QuestionIndex].ToString();
-                        lblB.Text = db.Answers.ListOptionB()[counters.QuestionIndex].ToString();
-                        lblC.Text = db.Answers.ListOptionC()[counters.QuestionIndex].ToString();
-                        lblD.Text = db.Answers.ListOptionD()[counters.QuestionIndex].ToString();
-                        counters.PrizeCounter++;
-                        counters.Time = 0;
-                        progressBar1.Value = 0;
-                        break;
-                    }
-                    if (counters.QuestionCount == 10)
-                    {
-                        MessageBox.Show("Congratulations, you won 500,000 TL!!!");
-                        this.Close();
-                        Form1 form = new Form1();
-                        form.ShowDialog();
-                        break;
-                    }
+                    return;
                 }
             }
+
+            // If no questions match the criteria
+            MessageBox.Show("No suitable questions available.");
         }
+
 
         public void UpdatePrize()
         {
