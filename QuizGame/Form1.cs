@@ -5,18 +5,19 @@ namespace QuizGame
 {
     public partial class Form1 : Form
     {
+        Sound sound = new Sound();
         int counter = 0;
 
         public Form1()
         {
             InitializeComponent();
-            Sound sound = new Sound();
+            this.Size = new Size(1200, 750);
+            this.StartPosition = FormStartPosition.CenterScreen;
             sound.StartIntro();
         }
 
         private void btnGame_Click(object sender, EventArgs e)
         {
-            Sound sound = new Sound();
             sound.StopIntro();
             timer1.Stop();
             Game game = new Game();
@@ -40,7 +41,6 @@ namespace QuizGame
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            Sound sound = new Sound();
             timer1.Interval = 1000;
             counter++;
             if (counter == 33)

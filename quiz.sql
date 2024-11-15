@@ -23,7 +23,7 @@ SELECT * FROM Answers
 INSERT INTO Answers VALUES ('A'),('B'),('C'),('D')
 INSERT INTO QuestionTypes VALUES ('Easy'),('Hard')
 
-INSERT INTO Questions VALUES ('who is the author of the novel "Frankenstein"?',
+INSERT INTO Questions VALUES ('Who is the author of the novel "Frankenstein"?',
                               'Mary Shelley',
                               'Sheridan Le Fanu',
                               'Bram Stoker',
